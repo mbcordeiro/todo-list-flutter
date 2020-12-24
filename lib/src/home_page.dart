@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/src/controllers/home_controller.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final controller = HomeController();
+
   _success() {
     return ListView.builder(
-      itemCount: 10,
+      itemCount: controller.todos.length,
       itemBuilder: (context, int index) {
+        var todo = controller.todos[index];
         return ListTile(
-          title: Text('item $index'),
+          leading: Checkbox(
+            value: todo.completed,
+            onChanged: (bool vlaue) {},
+          ),
+          title: Text(todo.title),
         );
       },
     );
@@ -16,7 +28,9 @@ class HomePage extends StatelessWidget {
   _error() {
     return Center(
       child: RaisedButton(
-        onPressed: () {},
+        onPressed: () {
+          controller.start();
+        },
         child: Text('Tentar novamente'),
       ),
     );
@@ -48,11 +62,31 @@ class HomePage extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+    controller.start();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('List Todo\'s'),
-        ),
-        body: stateManagement(HomeState.start));
+      appBar: AppBar(
+        title: Text('List Todo\'s'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh_outlined),
+            onPressed: () {
+              controller.start();
+            },
+          ),
+        ],
+      ),
+      body: AnimatedBuilder(
+        animation: controller.state,
+        builder: (context, child) {
+          return stateManagement(controller.state.value);
+        },
+      ),
+    );
   }
 }
