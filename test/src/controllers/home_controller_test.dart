@@ -12,7 +12,16 @@ main() {
   final controller = HomeController(repository);
   test('Must fill todo', () async {
     when(repository.fetchTodos()).thenAnswer((_) async => [TodoModel()]);
+    expect(controller.start(), HomeState.start);
     await controller.start();
+    expect(controller.start(), HomeState.sucess);
+    expect(controller.todos.isNotEmpty, true);
+  });
+  test('Must modify the state for error if the modification fails', () async {
+    when(repository.fetchTodos()).thenThrow(Exception());
+    expect(controller.start(), HomeState.start);
+    await controller.start();
+    expect(controller.start(), HomeState.sucess);
     expect(controller.todos.isNotEmpty, true);
   });
 }
